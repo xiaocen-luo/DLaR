@@ -1,0 +1,26 @@
+# Core dependencies
+torch>=2.6.0
+transformers>=4.55.0
+accelerate>=1.7.0
+deepspeed>=0.17.0
+datasets>=3.6.0
+trl>=0.21.0
+peft>=0.15.0
+
+# Math verification
+math-verify>=0.7.0
+
+# Utilities
+numpy>=2.1.0
+pandas>=2.2.0
+PyYAML>=6.0.0
+tqdm>=4.67.0
+
+# Distributed training
+ninja>=1.11.0
+
+# Logging and monitoring
+wandb>=0.18.0
+
+# Optional: for faster HuggingFace downloads
+hf_transfer>=0.1.9
