@@ -1,0 +1,125 @@
+seed: 42
+wandb_project: "LEPO-clean"
+
+model:
+  #path: "/public/home/xiangyuduan/models/hf/Qwen2.5-1.5B-Instruct/"
+  path: "/public/home/xiangyuduan/xcluo/lepo-main/outputs/qwen-CLaR-0shot-24-gumbel008-dapo-en-train-Hybrid-20261021_1339/checkpoint-200/"
+  torch_dtype: "bfloat16"
+  model_type: "qwen"
+
+data:
+  train:
+    name: "dapo"
+    split: "train"
+    subset: "en"
+    shot: 0
+  eval:
+    name: "aime2024"
+    split: "none"
+    subset: "none"
+    shot: 0
+
+generation:
+  max_new_tokens: 2048
+  temperature: 1.0
+  top_p: 0.95
+  top_k: 30
+  latent_length: 32
+  do_latent_sample: false
+  do_discrete_sample: true
+  
+  noise_type: "gumbel"  # gumbel, gaussian, dirichlet, soft
+  noise_strength: 0.50  # 0.30
+
+
+  use_confidence_guided_noise: true  # true  false
+  use_adaptive_noise: true          # 
+
+
+  confidence_weight: 0.7
+  entropy_weight: 0.3
+
+
+  min_noise_strength: 0.01
+  max_noise_strength: 0.3
+
+
+  noise_schedule: "linear"  # linear, cosine, step, none
+  noise_warmup_steps: 1000
+  noise_start_strength: 0.25
+  noise_end_strength: 0.02
+
+training:
+  learning_rate: 1e-6
+  adam_beta1: 0.9
+  adam_beta2: 0.99
+  weight_decay: 0.1
+  warmup_ratio: 0.03
+  lr_scheduler_type: "cosine"
+  bf16: true
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 256
+  steps_per_generation: 32
+  num_iterations: 2
+  num_generations: 8
+  max_prompt_length: 1024
+  num_train_epochs: 1
+  max_grad_norm: 1.0
+  logging_steps: 1
+  save_steps: 200
+  max_steps: 200
+  report_to: "tensorboard"
+  logging_dir: "./training_logs/dlar_qwen/a0.7_start0.35_end0.02_standard"
+
+eval:
+  do_eval: false
+  eval_strategy: "no"
+  eval_steps: 5
+  per_device_eval_batch_size: 8
+  eval_accumulation_steps: 8
+  eval_on_start: false
+
+## Hybrid Reward Configuration
+#reward:
+#  # 基础奖励
+#  answer_reward: 1.0
+#  format_penalty: -1.0
+#  
+#  # 相对长度控制（用于易题）
+#  relative_length_penalty: 1.0
+#  accuracy_requirement: 0.3  # 降低阈值，让更多问题被视为"难题"
+#  
+#  # 对比学习参数（用于难题） - 使用宽松条件
+#  contrastive_coefficient: 1.0   # 从 0.5 增加到 1.0
+#  top_k_short: 2
+#  length_ratio_threshold: 1.2    # 保留原阈值作为备选
+#  use_contrastive_for_hard: true
+  
+#  # 新增：对比学习的宽松触发条件
+#  min_length_diff: 20.0          # 最小绝对长度差
+#  length_ratio_threshold_abs: 1.3  # 绝对长度比阈值
+
+reward:
+#  answer_reward: 1.0
+#  format_penalty: -0.3
+
+#  contrastive_coefficient: 0.2  
+#  top_k_short: 1
+#  length_ratio_threshold: 1.6   
+#  temperature: 0.3
+
+  
+#  min_group_accuracy: 0.15      
+#  min_correct_samples: 1        
+#  use_absolute_diff: true
+#  min_length_diff: 20.0         
+#  length_ratio_threshold_abs: 1.2  
+  answer_reward: 1.0
+  format_penalty: -1.0
+  contrastive_coefficient: 1.0
+  top_k_short: 2
+  length_ratio_threshold: 1.2
+  temperature: 0.1
+
+output:
+  base_dir: "./outputs"

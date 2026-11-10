@@ -1,0 +1,111 @@
+seed: 42
+wandb_project: "GRPO"
+
+model:
+  #path: "/public/home/xiangyuduan/models/hf/Llama-3.2-1B-Instruct/"
+  path: "/public/home/xiangyuduan/xcluo/lepo-main/outputs/-llama-DLaR/checkpoint-50/"
+  torch_dtype: "bfloat16"
+  model_type: "llama"
+
+data:
+  train:
+    name: "dapo"
+    split: "train"
+    subset: "en"
+    shot: 0
+  eval:
+    name: "aime2024"
+    split: "none"
+    subset: "none"
+    shot: 0
+
+generation:
+  max_new_tokens: 2048
+  temperature: 1.0
+  top_p: 0.95
+  top_k: 30
+
+training:
+  learning_rate: 1e-6
+  adam_beta1: 0.9
+  adam_beta2: 0.99
+  weight_decay: 0.1
+  warmup_ratio: 0.03
+  lr_scheduler_type: "cosine"
+  bf16: true
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 256
+  steps_per_generation: 32
+  num_iterations: 2
+  num_generations: 8
+  max_prompt_length: 1024
+  num_train_epochs: 1
+  max_grad_norm: 1.0
+  logging_steps: 1
+  save_steps: 200
+  max_steps: 200
+  report_to: "tensorboard"
+  logging_dir: "./training_logs/grpo"
+  #  report_to: "none"
+
+
+
+
+## Hybrid Reward Configuration
+#reward:
+#  # 基础奖励
+#  answer_reward: 1.0
+#  format_penalty: -1.0
+  
+#  # 相对长度控制（用于易题）
+#  relative_length_penalty: 1.0
+#  accuracy_requirement: 0.3  # 降低阈值，让更多问题被视为"难题"
+  
+#  # 对比学习参数（用于难题） - 使用宽松条件
+#  contrastive_coefficient: 1.0   # 从 0.5 增加到 1.0
+#  top_k_short: 2
+#  length_ratio_threshold: 1.2    # 保留原阈值作为备选
+#  use_contrastive_for_hard: true
+  
+#  # 新增：对比学习的宽松触发条件
+#  min_length_diff: 20.0          # 最小绝对长度差
+#  length_ratio_threshold_abs: 1.3  # 绝对长度比阈值
+
+# Contrastive Length Optimization Configuration (Idea 3)
+reward:
+  answer_reward: 1.0
+  format_penalty: -1.0
+  contrastive_coefficient: 1.0
+  top_k_short: 2
+  length_ratio_threshold: 1.2
+  temperature: 0.1
+
+#use_relative_length_reward: true
+#
+## Reward configuration (used with --use_relative_length_reward flag)
+#reward:
+#  # Basic rewards
+#  answer_reward: 1.0      # Reward for correct answer
+#  format_penalty: -1.0    # Penalty for incorrectly formatted response
+#
+#  # Relative length control (from LEPO paper)
+#  relative_length_penalty: 1.0   # Coefficient for length penalty (easy questions)
+#  relative_length_reward: "same"  # Coefficient for length reward (hard questions)
+#                                  # Options: "same" (use same as penalty), or a float value
+#  accuracy_requirement: 0.3      # Threshold for easy/hard question classification
+#                                 # If group accuracy >= threshold -> apply penalty (encourage shorter)
+#                                 # If group accuracy < threshold -> apply reward (encourage longer)
+#
+#  # Distributed settings
+#  all_gather: false  # Whether to gather across devices for length calculation
+
+eval:
+  do_eval: false
+  eval_strategy: "no"
+  eval_steps: 5
+  per_device_eval_batch_size: 8
+  eval_accumulation_steps: 8
+  eval_on_start: false
+
+output:
+  base_dir: "./outputs"

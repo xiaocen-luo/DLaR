@@ -1,0 +1,96 @@
+seed: 42
+wandb_project: "DlaR-clean"
+
+model:
+  #path: "/public/home/xiangyuduan/models/hf/Llama-3.2-1B-Instruct/"
+  path: "/public/home/xiangyuduan/xcluo/lepo-main/outputs/-llama-DLaR/checkpoint-50/"
+  torch_dtype: "bfloat16"
+  model_type: "llama"
+
+data:
+  train:
+    name: "dapo"
+    split: "train"
+    subset: "en"
+    shot: 0
+  eval:
+    name: "aime2024"
+    split: "none"
+    subset: "none"
+    shot: 0
+
+generation:
+  max_new_tokens: 2048
+  temperature: 1.0
+  top_p: 0.95
+  top_k: 30
+  use_latent: true
+  latent_length: 32
+  do_latent_sample: false
+  do_discrete_sample: true
+  
+  noise_type: "gumbel"  #  gumbel, gaussian, dirichlet, soft
+  noise_strength: 0.15  # 0.30
+  
+  
+  use_confidence_guided_noise: true  #true  false
+  use_adaptive_noise: true          
+  
+  
+  confidence_weight: 0.7
+  entropy_weight: 0.3
+  
+  
+  min_noise_strength: 0.01
+  max_noise_strength: 0.3
+  
+  
+  noise_schedule: "linear"  #  linear, cosine, step, none
+  noise_warmup_steps: 1000
+  noise_start_strength: 0.25
+  noise_end_strength: 0.02
+ 
+
+training:
+  learning_rate: 1e-6
+  adam_beta1: 0.9
+  adam_beta2: 0.99
+  weight_decay: 0.1
+  warmup_ratio: 0.03
+  lr_scheduler_type: "cosine"
+  bf16: true
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 256
+  steps_per_generation: 32
+  num_iterations: 2
+  num_generations: 8
+  max_prompt_length: 1024
+  num_train_epochs: 1
+  max_grad_norm: 1.0
+  logging_steps: 1
+  save_steps: 200
+  max_steps: 200
+  report_to: "tensorboard"
+  logging_dir: "./training_logs/dlar/hyper"
+#  report_to: "none"
+
+
+eval:
+  do_eval: false
+  eval_strategy: "no"
+  eval_steps: 5
+  per_device_eval_batch_size: 8
+  eval_accumulation_steps: 8
+  eval_on_start: false
+
+# Reward configuration (used with --use_relative_length_reward flag)
+reward:
+  answer_reward: 1.0
+  format_penalty: -1.0
+  contrastive_coefficient: 1.0
+  top_k_short: 2
+  length_ratio_threshold: 1.2
+  temperature: 0.1
+
+output:
+  base_dir: "./outputs"
