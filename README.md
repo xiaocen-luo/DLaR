@@ -89,6 +89,16 @@ cd ./Soft-Thinking
 bash ./scripts/st/test_all_models.sh
 ```
 
+## 🏆 Best Model Weights
+
+Pre-trained DLaR weights are released on Hugging Face:
+
+| Model | Scale | Link |
+|-------|-------|------|
+| Llama-3.2-Instruct-DLaR | 1B | [xiaocen/DLaR-Llama3-1B](https://huggingface.co/xiaocen/DLaR-Llama3-1B) |
+
+> 💡 Tip: After downloading the weights, remember to apply the architecture change described in [Model Evaluation](#3-model-evaluation) before running inference.
+
 ## ⚙️ Configuration Guide
 
 ### Training Configuration (DLaR)
